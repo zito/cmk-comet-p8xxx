@@ -89,7 +89,7 @@ def check_comet_p8xxx(item, params, info):
             elif warn_max is not None and chval >= warn_max:
                 status = 1
                 txt += ' (!) >= %.1f' % warn_max
-            perf = ('temp', chval)
+            perf = ('tempc', chval)
             perf += tuple(map(lambda x: x or None, (
                 ':'.join(filter(None, (xstr(warn_min), xstr(warn_max)))),
                 ':'.join(filter(None, (xstr(crit_min), xstr(crit_max)))))))

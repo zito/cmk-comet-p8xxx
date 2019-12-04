@@ -59,7 +59,7 @@ class fake_file:
 #-----------------------------------------------------------------------
 
 pacname = 'cmk-comet-p8xxx'
-version = '1.1'
+version = '1.6'
 
 filelists = {}
 package = {
@@ -67,8 +67,8 @@ package = {
     "name"                 : pacname,
     "description"          : "Extension for monitoring Comet P8xxx temperature sensor using SNMP",
     "version"              : version,
-    "version.packaged"     : '1.1.12p7',
-    "version.min_required" : '1.1.12p7',
+    "version.packaged"     : '1.6.0p6',
+    "version.min_required" : '1.6.0p6',
     "author"               : "Vaclav Ovsik",
     "download_url"         : "https://github.com/zito/%s" % pacname,
     "files"                : filelists

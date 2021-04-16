@@ -1,19 +1,24 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # -*- encoding: utf-8; py-indent-offset: 4 -*-
 #
 # Code extracted from Check MK...
 #
 
-import os, pprint, tarfile, time
+import json
+import os
+import pprint
+import subprocess
+import tarfile
+import time
 
 package_parts = [
-  ( "checks",        "Checks",                    "checks"),
-  ( "checkman",      "Checks' man pages",         "checks-man"),
-  ( "agents",        "Agents",                    "agents"),
-  ( "web",           "Multisite extensions",      "web"),
-  ( "pnp-templates", "PNP4Nagios templates",      "pnp-templates"),
-  ( "pnp-rraconf",   "RRA configuration for PNP", "pnp-rraconf"),
-  ( "doc",           "Documentation files",       "doc"),
+  ( "checks",        "Checks",                      "checks"),
+  ( "agent_based",   "Agent based plugins (Checks, Inventory)", "agent_based"),
+  ( "checkman",      "Checks' man pages",           "checks-man"),
+  ( "agents",        "Agents",                      "agents"),
+  ( "notifications", "Notification scripts",        "notifications"),
+  ( "web",           "GUI extensions",              "web"),
+  ( "doc",           "Documentation files",         "doc"),
 ]
 
 pac_ext = ".mkp"
@@ -59,26 +64,28 @@ class fake_file:
 #-----------------------------------------------------------------------
 
 pacname = 'cmk-comet-p8xxx'
-version = '1.6'
+version = '2.0'
 
 filelists = {}
 package = {
     "title"                : "Comet P8xxx temperature sensor checks",
     "name"                 : pacname,
-    "description"          : "Extension for monitoring Comet P8xxx temperature sensor using SNMP",
+    "description"          : "monitoring Comet P8xxx temperature sensor using SNMP",
     "version"              : version,
-    "version.packaged"     : '1.6.0p6',
-    "version.min_required" : '1.6.0p6',
+    "version.packaged"     : '2.0.0p1',
+    "version.min_required" : '2.0.0p1',
+    "version.usable_until" : None,
     "author"               : "Vaclav Ovsik",
-    "download_url"         : "https://github.com/zito/%s" % pacname,
+    "download_url"         : "https://github.com/zito/%s/" % pacname,
     "files"                : filelists
 }
 
 num_files = 0
 for part, title, dir in package_parts:
     files = files_in_dir(part, dir)
-    filelists[part] = files
-    num_files += len(files)
+    if files:
+        filelists[part] = files
+        num_files += len(files)
 package["num_files"] = num_files
 
 
@@ -90,22 +97,28 @@ def create_info(filename, size):
     info.uid = 0
     info.gid = 0
     info.size = size
-    info.mode = 0644
+    info.mode = 0o644
     info.type = tarfile.REGTYPE
     info.name = filename
     return info
 
 tar = tarfile.open(tarfilename, "w:gz")
-info_file = fake_file(pprint.pformat(package))
+info_file = fake_file(pprint.pformat(package).encode())
 info = create_info("info", info_file.size())
 tar.addfile(info, info_file)
+infojson_file = fake_file(json.dumps(package).encode())
+infojson = create_info("info.json", infojson_file.size())
+tar.addfile(infojson, infojson_file)
 
 # Now pack the actual files into sub tars
 for part, title, dir in package_parts:
     filenames = package["files"].get(part, [])
     if len(filenames) > 0:
         subtarname = part + ".tar"
-        subdata = os.popen("tar cf - --dereference --force-local -C '%s' %s" % (dir, " ".join(filenames))).read()
+        proc = subprocess.Popen(['tar', 'cf', '-', '--dereference', '--force-local',
+                '-C', dir, *filenames],
+                stdout=subprocess.PIPE)
+        subdata = proc.stdout.read()
         info = create_info(subtarname, len(subdata))
         tar.addfile(info, fake_file(subdata))
 

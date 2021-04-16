@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 # -*- encoding: utf-8; py-indent-offset: 4 -*-
 # vim:sta:si:sw=4:sts=4:et:
 # +------------------------------------------------------------------+
@@ -47,6 +47,9 @@
 #     'error 1']]
 #
 
+from cmk.base.check_legacy_includes.temperature import *  # pylint: disable=wildcard-import,unused-wildcard-import
+
+
 def parse_comet_p8xxx(info):
     if len(info) != 1:
         return
@@ -89,6 +92,5 @@ check_info['comet_p8xxx'] = {
         '4.2',    # P8510-MIB::ch4Val
     ]),
     'group': 'temperature',
-    'includes': ["temperature.include"],
     'default_levels_variable': 'comet_p8xxx_default_levels',
 }

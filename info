@@ -1,0 +1,10 @@
+{'author': 'Vaclav Ovsik',
+ 'description': 'monitoring Comet P8xxx temperature sensor using SNMP',
+ 'download_url': 'https://github.com/zito/cmk-comet-p8xxx/',
+ 'files': {'agent_based': ['comet_p8xxx.py']},
+ 'name': 'cmk-comet-p8xxx',
+ 'title': 'Comet P8xxx temperature sensor checks',
+ 'version': '2.2.0',
+ 'version.min_required': '2.2.0',
+ 'version.packaged': 'cmk-mkp-tool 0.2.0',
+ 'version.usable_until': None}

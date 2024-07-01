@@ -1,0 +1,20 @@
+#!/bin/sh
+set -e
+
+mkp_extract() {
+    f="$1"
+
+    wd=$(mktemp -d "$(pwd)/mkp.XXXXXX")
+    trap "rm -rf $wd" EXIT
+    tar -C $wd -xf "$f"
+
+    cd $wd
+    for tb in *.tar; do
+	test -f "$tb" || exit 1
+	mkdir -p "${tb%%.tar}" && tar -C "${tb%%.tar}" -xf "$tb" && rm "$tb"
+    done
+
+    cp -a * ..
+}
+
+mkp_extract "$1"

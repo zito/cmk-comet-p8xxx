@@ -26,19 +26,21 @@
 
 from collections.abc import Mapping
 
-from .agent_based_api.v1.type_defs import CheckResult, DiscoveryResult, StringTable
-from .agent_based_api.v1 import (
-    OIDEnd,
+from cmk.agent_based.v2 import (
+    CheckPlugin,
+    CheckResult,
+    DiscoveryResult,
     Result,
     SNMPTree,
     Service,
+    SimpleSNMPSection,
     State,
+    StringTable,
     equals,
     get_value_store,
-    register,
 )
 
-from .utils.temperature import check_temperature, TempParamType
+from cmk.plugins.lib.temperature import check_temperature, TempParamType
 
 Section = Mapping[str, float]
 
@@ -54,7 +56,7 @@ def parse_comet_p8xxx(string_table: StringTable) -> Section:
             pass
     return section
 
-register.snmp_section(
+snmp_section_comet_p8xxx = SimpleSNMPSection(
     name="comet_p8xxx",
     detect=equals(
         ".1.3.6.1.2.1.1.2.0",
@@ -95,7 +97,7 @@ def check_comet_p8xxx(
         yield Result(state=State.UNKNOWN, summary="Item not found")
 
 
-register.check_plugin(
+check_plugin_comet_p8xxx = CheckPlugin(
     name="comet_p8xxx",
     service_name="Sensor %s",
     discovery_function=inventory_comet_p8xxx,

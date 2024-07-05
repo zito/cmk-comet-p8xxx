@@ -36,6 +36,7 @@ from cmk.agent_based.v2 import (
     SimpleSNMPSection,
     State,
     StringTable,
+    any_of,
     equals,
     get_value_store,
 )
@@ -56,11 +57,13 @@ def parse_comet_p8xxx(string_table: StringTable) -> Section:
             pass
     return section
 
+OID_sysObjectID = ".1.3.6.1.2.1.1.2.0"
+
 snmp_section_comet_p8xxx = SimpleSNMPSection(
     name="comet_p8xxx",
-    detect=equals(
-        ".1.3.6.1.2.1.1.2.0",
-        ".1.3.6.1.4.1.1723.2.1.2",
+    detect=any_of(
+        equals(OID_sysObjectID, ".1.3.6.1.4.1.1723.2.1.2"),
+        equals(OID_sysObjectID, ".1.3.6.1.4.1.22626.1.5"),
     ),
     fetch=SNMPTree(
         base=".1.3.6.1.4.1.22626.1.5.2",
@@ -103,5 +106,5 @@ check_plugin_comet_p8xxx = CheckPlugin(
     discovery_function=inventory_comet_p8xxx,
     check_function=check_comet_p8xxx,
     check_ruleset_name="temperature",
-    check_default_parameters={},
+    check_default_parameters={"levels": (32.0, 35.0)},
 )
